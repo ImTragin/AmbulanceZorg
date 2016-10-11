@@ -1,80 +1,69 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PatientBehavior : MonoBehaviour {
 
-    public GameObject requiredItem;
-    private GameObject equippedItem;
+	public GameControllerBehavior controller;
 
-    public NurseBehavior nurseScript;
-    public GameControllerBehavior controller;
+	//Handling of the health
+	public float health = 100;
+	public float severity;
 
-    //Handling of the health
-    public float health = 100;
-    public float severity;
+	//All body components that need to be healthy
+	public BodyComponentBehavior com_1;
+	public BodyComponentBehavior com_2;
+	public BodyComponentBehavior com_3;
+	public BodyComponentBehavior com_4;
+	public BodyComponentBehavior com_5;
+	public BodyComponentBehavior com_6;
 
-    //When healed
-    public bool isHealed;
+	//When healed
+	public bool isHealed;
 
 	// Use this for initialization
 	void Start () {
-	
+
 	}
-	
+
 
 	// Update is called once per frame
 	void FixedUpdate () {
 
-        if (isHealed == true)
-        {
-            startMoving();
-        }
+		if (com_1.partHealed == true && com_2.partHealed == true && com_3.partHealed == true && com_4.partHealed == true 
+			&& com_5.partHealed == true && com_6.partHealed == true)
+		{
+			isHealed = true;
+		}
 
-        
-        equippedItem = nurseScript.itemUsing;
 
-        if (health <= 0)
-        {
-            Destroy(gameObject);
-        }
+		if (isHealed == true && health >= 0)
+		{
+			startMoving();
+		}
 
-        health -= Time.deltaTime * severity;
+
+		if (health < 0)
+		{
+			transform.Translate(transform.position.x, transform.position.y - 6, transform.position.z, Space.Self);
+			transform.Rotate(90, transform.rotation.y , transform.rotation.z , Space.Self);
+			health = 0;
+			severity = 0;
+		}
+
+		health -= Time.deltaTime * severity;
 
 	}
 
 
-    void OnMouseDown()
-    {
-        nurseScript.itemUsing = null;
-        
-        if (requiredItem == equippedItem)
-        {
-            isTreated();
-        }
-        else if (requiredItem != equippedItem)
-        {
-            health -= 50 * severity;
-        }
-    }
+	void startMoving()
+	{
+		transform.Translate(Vector3.back * Time.deltaTime * 10, Space.Self);
+	}
 
-
-    void isTreated()
-    {
-        isHealed = true;        
-    }
-
-
-    void startMoving()
-    {
-        transform.Translate(Vector3.back * Time.deltaTime * 10, Space.Self);
-    }
-
-    void OnCollisionEnter(Collision col)
-    {
-        if (col.collider.tag == "CROWD")
-        {
-            Destroy(gameObject);
-        }
-    }
+	public void destroyMe()
+	{
+		Destroy(gameObject); 
+	}
 
 }
